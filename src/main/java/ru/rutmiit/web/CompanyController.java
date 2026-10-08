@@ -1,14 +1,14 @@
 package ru.rutmiit.web;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import ru.rutmiit.model.CompanySummary;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import ru.rutmiit.services.CompanyService;
 
-import java.util.stream.Collectors;
-
 @Controller
+@RequestMapping("/companies")
 public class CompanyController {
 
     private final CompanyService companyService;
@@ -17,27 +17,21 @@ public class CompanyController {
         this.companyService = companyService;
     }
 
-    @GetMapping(value = "/", produces = "text/plain;charset=UTF-8")
-    @ResponseBody
-    public String home() {
-        return "Система управления компаниями. Откройте /companies";
+    @GetMapping
+    public String allCompanies(Model model) {
+        model.addAttribute("companyInfos", companyService.allCompanies());
+        return "company-all";
     }
 
-    @GetMapping(value = "/companies", produces = "text/plain;charset=UTF-8")
-    @ResponseBody
-    public String companies() {
-        return companyService.allCompanies().stream()
-                .map(this::formatCompany)
-                .collect(Collectors.joining(System.lineSeparator()));
-    }
-
-    @GetMapping(value = "/companies/count", produces = "text/plain;charset=UTF-8")
-    @ResponseBody
-    public String countCompanies() {
-        return "Всего компаний: " + companyService.companyCount();
-    }
-
-    private String formatCompany(CompanySummary company) {
-        return company.name() + " | " + company.town() + " | " + company.description();
+    @GetMapping("/{companyName}")
+    public String companyDetails(
+            @PathVariable String companyName,
+            Model model
+    ) {
+        model.addAttribute(
+                "companyDetails",
+                companyService.companyDetails(companyName)
+        );
+        return "company-details";
     }
 }

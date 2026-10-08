@@ -8,5 +8,5 @@ public interface CompanyService {
 
     List<CompanySummary> allCompanies();
 
-    int companyCount();
+    CompanySummary companyDetails(String companyName);
 }

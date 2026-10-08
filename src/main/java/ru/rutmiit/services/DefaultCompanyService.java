@@ -3,8 +3,8 @@ package ru.rutmiit.services;
 import org.springframework.stereotype.Service;
 import ru.rutmiit.catalog.CompanyCatalog;
 import ru.rutmiit.model.CompanySummary;
+import ru.rutmiit.services.exceptions.CompanyNotFoundException;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -18,11 +18,14 @@ public class DefaultCompanyService implements CompanyService {
 
     @Override
     public List<CompanySummary> allCompanies() {
-        return companyCatalog.findAll().stream().sorted(Comparator.comparing(CompanySummary::name)).toList();
+        return companyCatalog.findAll();
     }
 
     @Override
-    public int companyCount() {
-        return companyCatalog.findAll().size();
+    public CompanySummary companyDetails(String companyName) {
+        return companyCatalog.findAll().stream()
+                .filter(company -> company.name().equals(companyName))
+                .findFirst()
+                .orElseThrow(() -> new CompanyNotFoundException(companyName));
     }
 }
